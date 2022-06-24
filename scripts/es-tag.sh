@@ -41,14 +41,9 @@ tagImages() {
     fullTag=${MAJOR_VERSIONS[$majorTag]}
     echo; docker pull ${FULL_IMAGE_NAME}:${fullTag}
 
-    echo "Tagging $fullTag...";
-    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" jahia/"${IMAGE_NAME}":"${fullTag}"
-
-    echo "Tagging $fullTag => $majorTag...";
-    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" jahia/"${IMAGE_NAME}":"${majorTag}"
-
     minorTag="$majorTag.$(minorVer "$fullTag")"
-    echo "Tagging $fullTag => $minorTag...";
+    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" jahia/"${IMAGE_NAME}":"${fullTag}"
+    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" jahia/"${IMAGE_NAME}":"${majorTag}"
     tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" jahia/"${IMAGE_NAME}":"${minorTag}"
   done
 }
@@ -64,8 +59,9 @@ majorVer() { echo -e "$1" | awk -F . '{print $1}'; }
 # extract minor version e.g. 7.12.4 => 12
 minorVer() { echo -e "$1" | awk -F . '{print $2}'; }
 tagAndPushImage() {
+  echo "Tagging $1 => $2..."
   docker tag "$1" "$2"
-  # docker push "$2"
+  docker push "$2"
 }
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+#

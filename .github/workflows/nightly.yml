@@ -1,0 +1,20 @@
+name: Elasticsearch docker tagging
+
+on:
+  schedule:
+    - cron:  '0 2 * * *' # run at 2am UTC
+
+jobs:
+  elasticsearch-tag:
+    name: Tag elasticsearch versions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3 
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Execute script to tag elasticsearch
+        run: bash ${GITHUB_WORKSPACE}/scripts/es-tag.sh

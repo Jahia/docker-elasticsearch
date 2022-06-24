@@ -36,6 +36,9 @@ getLatestVersions() {
     done <<< "$VERSIONS_LIST"
 }
 
+# Parameters:
+# $1 - source image+tag
+# $2 - target image+tag to push to remote repository
 tagImages() {
   for majorTag in "${!MAJOR_VERSIONS[@]}"; do
     fullTag=${MAJOR_VERSIONS[$majorTag]}
@@ -61,7 +64,6 @@ minorVer() { echo -e "$1" | awk -F . '{print $2}'; }
 tagAndPushImage() {
   echo "Tagging $1 => $2..."
   docker tag "$1" "$2"
-
   if [ "${DRY_RUN}" == "true" ]; then
     echo "Skipping push to docker repository"
   else
@@ -93,4 +95,4 @@ echo; echo "Calculating latest major versions..."
 getLatestVersions
 echo; echo "Tagging images..."
 tagImages
-docker images # verify
+echo; docker images # verify

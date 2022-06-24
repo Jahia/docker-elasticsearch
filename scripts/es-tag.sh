@@ -61,13 +61,18 @@ minorVer() { echo -e "$1" | awk -F . '{print $2}'; }
 tagAndPushImage() {
   echo "Tagging $1 => $2..."
   docker tag "$1" "$2"
-  docker push "$2"
+
+  if [ "${DRY_RUN}" == "true" ]; then
+    echo "Skipping push to docker repository"
+  else
+    docker push "$2"
+  fi
 }
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+#
 
 # Variable declaration
-MIN_VERSION=7.0.0 # ignore any version below this
+MIN_VERSION=7.17.4 # ignore any version below this
 VERSIONS_LIST=
 declare -A MAJOR_VERSIONS=()
 
@@ -79,6 +84,9 @@ if [ -z  "${FULL_IMAGE_NAME}" ] || [ -z "${IMAGE_NAME}" ]; then
 fi
 
 # main()
+if [ "${DRY_RUN}" == "true" ]; then
+  echo; echo "Running in DRY RUN mode:"
+fi
 echo; echo "Fetching ${FULL_IMAGE_NAME} versions..."
 fetchVersions
 echo; echo "Calculating latest major versions..."

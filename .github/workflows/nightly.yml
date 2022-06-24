@@ -2,6 +2,10 @@ name: Elasticsearch docker tagging
 
 on:
   workflow_dispatch:
+    inputs:
+      dryRun:
+        description: 'When set to `true`, run script but without pushing images to repository'
+        default: "false"
   schedule:
     - cron:  '0 2 * * *' # run at 2am UTC
 
@@ -18,6 +22,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Tag elasticsearch versions
+        env:
+          DRY_RUN: ${{ github.event.inputs.dryRun }}
         run: bash ${GITHUB_WORKSPACE}/scripts/es-tag.sh library/elasticsearch
       - name: Tag kibana versions
+        env:
+          DRY_RUN: ${{ github.event.inputs.dryRun }}
         run: bash ${GITHUB_WORKSPACE}/scripts/es-tag.sh library/kibana

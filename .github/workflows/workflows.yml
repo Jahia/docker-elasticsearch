@@ -1,0 +1,39 @@
+name: Elasticsearch docker tagging
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      dryRun:
+        description: 'When set to `true`, run script but without pushing images to repository'
+        default: "false"
+  schedule:
+    - cron:  '0 2 * * *' # run at 2am UTC
+
+jobs:
+  elasticsearch-tag:
+    name: Tag elasticsearch versions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3 
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Set environment variables
+        shell: bash
+        run: |
+          if [ ${{ github.event_name }} == "pull_request" ]; then
+            DRY_RUN=true
+          fi
+          echo "DRY_RUN=${DRY_RUN:-${{ github.event.inputs.dryRun }}}" >> $GITHUB_ENV
+      - name: Tag elasticsearch versions
+        shell: bash
+        run: |
+          DRY_RUN=${DRY_RUN} ${GITHUB_WORKSPACE}/scripts/es-tag.sh library/elasticsearch
+      - name: Tag kibana versions
+        shell: bash
+        run: |
+          DRY_RUN=${DRY_RUN} ${GITHUB_WORKSPACE}/scripts/es-tag.sh library/kibana

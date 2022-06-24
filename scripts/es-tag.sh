@@ -74,6 +74,7 @@ declare -A MAJOR_VERSIONS=()
 FULL_IMAGE_NAME=$1
 IMAGE_NAME=$(echo -e "${FULL_IMAGE_NAME}" | awk -F '/' '{print $2}')
 if [ -z  "${FULL_IMAGE_NAME}" ] || [ -z "${IMAGE_NAME}" ]; then
+  echo "Invalid fully qualified image name: ${FULL_IMAGE_NAME}"
   exit 1
 fi
 

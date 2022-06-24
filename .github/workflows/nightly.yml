@@ -1,6 +1,7 @@
 name: Elasticsearch docker tagging
 
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       dryRun:
@@ -21,11 +22,18 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Set environment variables
+        shell: bash
+        run: |
+          if [ ${{ github.event_name }} == "pull_request" ]; then
+            DRY_RUN=true
+          fi
+          echo "DRY_RUN=${DRY_RUN:-${{ github.event.inputs.dryRun }}}" >> $GITHUB_ENV
       - name: Tag elasticsearch versions
-        env:
-          DRY_RUN: ${{ github.event.inputs.dryRun }}
-        run: bash ${GITHUB_WORKSPACE}/scripts/es-tag.sh library/elasticsearch
+        shell: bash
+        run: |
+          DRY_RUN=${DRY_RUN} ${GITHUB_WORKSPACE}/scripts/es-tag.sh library/elasticsearch
       - name: Tag kibana versions
-        env:
-          DRY_RUN: ${{ github.event.inputs.dryRun }}
-        run: bash ${GITHUB_WORKSPACE}/scripts/es-tag.sh library/kibana
+        shell: bash
+        run: |
+          DRY_RUN=${DRY_RUN} ${GITHUB_WORKSPACE}/scripts/es-tag.sh library/kibana

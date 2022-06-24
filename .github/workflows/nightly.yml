@@ -17,5 +17,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Execute script to tag elasticsearch
-        run: bash ${GITHUB_WORKSPACE}/scripts/es-tag.sh
+      - name: Tag elasticsearch versions
+        run: bash ${GITHUB_WORKSPACE}/scripts/es-tag.sh library/elasticsearch
+      - name: Tag kibana versions
+        run: bash ${GITHUB_WORKSPACE}/scripts/es-tag.sh library/kibana

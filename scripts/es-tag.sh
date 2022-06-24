@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
 
+# Parameters: 
+#  $1 - Fully qualified docker image name e.g. library/elasticsearch
+
+# Do semantic version tagging for elasticsearch/kibana images:
+# 1. Fetch last updated versions
+# 2. Calculate latest major versions
+# 3. Re-tag with semantic versions and push to jahia/ repository
+
+set -eo pipefail
+shopt -s inherit_errexit
+
 # Set VERSIONS_LIST env variable with last updated versions
 fetchVersions() {
-  dockerHubUrl="https://hub.docker.com/v2/repositories/library/elasticsearch/tags?ordering=last_updated&page_size=50"
+  dockerHubUrl="https://hub.docker.com/v2/repositories/${FULL_IMAGE_NAME}/tags?ordering=last_updated&page_size=50"
   VERSIONS_LIST=$(curl --get -s "${dockerHubUrl}" \
     | jq -r '.results[].name' \
     | sort -Vr)
@@ -28,17 +39,17 @@ getLatestVersions() {
 tagImages() {
   for majorTag in "${!MAJOR_VERSIONS[@]}"; do
     fullTag=${MAJOR_VERSIONS[$majorTag]}
-    echo; docker pull elasticsearch:${fullTag}
+    echo; docker pull ${FULL_IMAGE_NAME}:${fullTag}
 
     echo "Tagging $fullTag...";
-    tagAndPushImage elasticsearch:"${fullTag}" jahia/elasticsearch:"${fullTag}"
+    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" jahia/"${IMAGE_NAME}":"${fullTag}"
 
     echo "Tagging $fullTag => $majorTag...";
-    tagAndPushImage elasticsearch:"${fullTag}" jahia/elasticsearch:"${majorTag}"
+    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" jahia/"${IMAGE_NAME}":"${majorTag}"
 
     minorTag="$majorTag.$(minorVer "$fullTag")"
     echo "Tagging $fullTag => $minorTag...";
-    tagAndPushImage elasticsearch:"${fullTag}" jahia/elasticsearch:"${minorTag}"
+    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" jahia/"${IMAGE_NAME}":"${minorTag}"
   done
 }
 
@@ -64,8 +75,14 @@ MIN_VERSION=7.0.0 # ignore any version below this
 VERSIONS_LIST=
 declare -A MAJOR_VERSIONS=()
 
+FULL_IMAGE_NAME=$1
+IMAGE_NAME=$(echo -e "${FULL_IMAGE_NAME}" | awk -F '/' '{print $2}')
+if [ -z  "${FULL_IMAGE_NAME}" ] || [ -z "${IMAGE_NAME}" ]; then
+  exit 1
+fi
+
 # main()
-echo; echo "Fetching ES versions..."
+echo; echo "Fetching ${FULL_IMAGE_NAME} versions..."
 fetchVersions
 echo; echo "Calculating latest major versions..."
 getLatestVersions

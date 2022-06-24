@@ -1,6 +1,7 @@
 name: Elasticsearch docker tagging
 
 on:
+  workflow_dispatch:
   schedule:
     - cron:  '0 2 * * *' # run at 2am UTC
 

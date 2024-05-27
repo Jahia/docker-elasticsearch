@@ -62,8 +62,8 @@ majorVer() { echo -e "$1" | awk -F . '{print $1}'; }
 # extract minor version e.g. 7.12.4 => 12
 minorVer() { echo -e "$1" | awk -F . '{print $2}'; }
 tagAndPushImage() {
-  echo "Tagging $1 => $2..."
-  docker tag "$1" "$2"
+  echo "Using buildx to tag $1 => $2..."
+  docker buildx imagetools create -t "$2" "$1"
   if [ "${DRY_RUN}" == "true" ]; then
     echo "Skipping push to docker repository"
   else

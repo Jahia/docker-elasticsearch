@@ -63,7 +63,7 @@ majorVer() { echo -e "$1" | awk -F . '{print $1}'; }
 minorVer() { echo -e "$1" | awk -F . '{print $2}'; }
 tagAndPushImage() {
   echo "Using buildx to tag $1 => $2..."
-  docker buildx imagetools create -t "$2" "$1"
+  docker buildx imagetools create -t "$1" "$2"
   if [ "${DRY_RUN}" == "true" ]; then
     echo "Skipping push to docker repository"
   else

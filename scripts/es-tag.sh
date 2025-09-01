@@ -45,9 +45,9 @@ tagImages() {
     echo; docker pull ${FULL_IMAGE_NAME}:${fullTag}
 
     minorTag="$majorTag.$(minorVer "$fullTag")"
-    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" jahia/"${IMAGE_NAME}":"${fullTag}"
-    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" jahia/"${IMAGE_NAME}":"${majorTag}"
-    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" jahia/"${IMAGE_NAME}":"${minorTag}"
+    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" ghcr.io/jahia/"${IMAGE_NAME}":"${fullTag}"
+    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" ghcr.io/jahia/"${IMAGE_NAME}":"${majorTag}"
+    tagAndPushImage "${FULL_IMAGE_NAME}":"${fullTag}" ghcr.io/jahia/"${IMAGE_NAME}":"${minorTag}"
   done
 }
 
